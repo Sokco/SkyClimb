@@ -38,7 +38,7 @@ struct OurEventSink : public RE::BSTEventSink<SKSE::CameraEvent> {
 
 std::string SayHello(RE::StaticFunctionTag *) { 
 
-    return "Hello from SkyClimb 4!"; 
+    return "Hello from SkyClimb 5!"; 
 }
 
 
@@ -69,11 +69,8 @@ void ToggleJumpingInternal(bool enabled) {
 void ToggleJumping(RE::StaticFunctionTag *, bool enabled) { ToggleJumpingInternal(enabled); }
 
 
-
-
-
-float GetCameraAngleToObject(RE::NiPoint3 objPoint) {
-
+//camera versus head 'to object angle'. Angle between the vectors 'camera to object' and 'player head to object'
+float CameraVsHeadToObjectAngle(RE::NiPoint3 objPoint) {
     const auto player = RE::PlayerCharacter::GetSingleton();
 
     RE::NiPoint3 playerToObject = objPoint - (player->GetPosition() + RE::NiPoint3(0, 0, 120));
@@ -87,7 +84,6 @@ float GetCameraAngleToObject(RE::NiPoint3 objPoint) {
     const float radToDeg = (float)57.2958;
 
     return acos(dot) * radToDeg;
-
 }
 
 
@@ -263,7 +259,7 @@ bool UpdateParkourPointInternal(RE::TESObjectREFR* medMarkerRef, RE::TESObjectRE
     }
 
     //if camera facing too far away from ledgepoint
-    if (GetCameraAngleToObject(ledgePoint) > 80) {
+    if (CameraVsHeadToObjectAngle(ledgePoint) > 80) {
         return false;
     }
 
@@ -320,9 +316,6 @@ bool UpdateParkourPointInternal(RE::TESObjectREFR* medMarkerRef, RE::TESObjectRE
     highMarkerRef->data.angle = RE::NiPoint3(0, 0, zAngle);
     medMarkerRef->data.angle = RE::NiPoint3(0, 0, zAngle);
     indicatorRef->data.angle = RE::NiPoint3(0, 0, zAngle);
-
-
-
 
 
     return true;
