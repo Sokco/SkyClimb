@@ -1,7 +1,22 @@
-#include <spdlog/sinks/basic_file_sink.h>
-
 namespace logger = SKSE::log;
 
+void SetupLog() {
+    auto logsFolder = SKSE::log::log_directory();
+    if (!logsFolder) SKSE::stl::report_and_fail("SKSE log_directory not provided, logs disabled.");
+
+    auto pluginName = "SkyClimb";
+    auto logFilePath = *logsFolder / std::format("{}.log", pluginName);
+    auto fileLoggerPtr = std::make_shared<spdlog::sinks::basic_file_sink_mt>(logFilePath.string(), true);
+    auto loggerPtr = std::make_shared<spdlog::logger>("log", std::move(fileLoggerPtr));
+
+    spdlog::set_default_logger(std::move(loggerPtr));
+    spdlog::set_level(spdlog::level::info);
+    spdlog::flush_on(spdlog::level::info);
+
+    spdlog::set_pattern("%v");
+}
+
+/*
 void SetupLog() {
     auto logsFolder = SKSE::log::log_directory();
     if (!logsFolder) SKSE::stl::report_and_fail("SKSE log_directory not provided, logs disabled.");
@@ -13,6 +28,7 @@ void SetupLog() {
     spdlog::set_level(spdlog::level::trace);
     spdlog::flush_on(spdlog::level::trace);
 }
+*/
 
 /*
 struct OurEventSink : public RE::BSTEventSink<SKSE::CameraEvent> {
@@ -509,6 +525,30 @@ bool PapyrusFunctions(RE::BSScript::IVirtualMachine * vm) {
     return true; 
 }
 
+extern "C" DLLEXPORT constinit auto SKSEPlugin_Version = []() {
+    SKSE::PluginVersionData v;
+    v.PluginVersion({Version::MAJOR, Version::MINOR, Version::PATCH});
+    v.PluginName("SkyClimb");
+    v.AuthorName("Sokco");
+    v.UsesAddressLibrary();
+    v.UsesUpdatedStructs();
+    v.CompatibleVersions({SKSE::RUNTIME_1_6_1130, 
+        {(unsigned short)1U, (unsigned short)6U, (unsigned short)1170U, (unsigned short)0U}});
+
+    return v;
+}();
+
+extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface *a_skse) {
+    SetupLog();
+
+    SKSE::Init(a_skse);
+    logger::info("SkyClimb Papyrus Started!");
+    SKSE::GetPapyrusInterface()->Register(PapyrusFunctions);
+
+    return true;
+}
+
+/*
 SKSEPluginLoad(const SKSE::LoadInterface *skse) {
     SKSE::Init(skse);
 
@@ -529,3 +569,4 @@ SKSEPluginLoad(const SKSE::LoadInterface *skse) {
 
     return true;
 }
+*/

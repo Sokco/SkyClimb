@@ -1,8 +1,20 @@
 {
     "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
-    "name": "hello-world",
-    "version-string": "0.0.1",
+    "name": "sky-climb",
+    "version-string": "1.2.0",
     "dependencies": [
-        "commonlibsse-ng"
-    ]
+      "boost-stl-interfaces",
+      "frozen",
+      "rsm-binary-io",
+      "srell",
+      "spdlog",
+      "xbyak"
+    ],
+    "overrides": [
+      {
+        "name": "fmt",
+        "version": "9.1.0"
+      }
+    ],
+    "builtin-baseline": "b7dba7f9aad09a56900f21cd78cfda1258e54e38"
 }

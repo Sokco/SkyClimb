@@ -1,34 +1,66 @@
 {
-    "version": 3,
-    "configurePresets": [
-        {
-            "name": "base",
-            "hidden": true,
-            "generator": "Ninja",
-            "binaryDir": "${sourceDir}/build/${presetName}",
-            "installDir": "${sourceDir}/install/${presetName}",
-            "architecture": { "value": "x64", "strategy": "external" },
-            "cacheVariables": {
-                "CMAKE_CXX_COMPILER": "cl.exe",
-                "CMAKE_CXX_FLAGS": "/permissive- /Zc:preprocessor /EHsc /MP /W4 -DWIN32_LEAN_AND_MEAN -DNOMINMAX -DUNICODE -D_UNICODE",
-                "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
-                "VCPKG_TARGET_TRIPLET": "x64-windows-static",
-                "VCPKG_OVERLAY_TRIPLETS": "${sourceDir}/cmake",
-                "CMAKE_MSVC_RUNTIME_LIBRARY": "MultiThreaded$<$<CONFIG:Debug>:Debug>",
-                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
-            }
-        },
-        {
-            "name": "debug",
-            "inherits": ["base"],
-            "displayName": "Debug",
-            "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
-        },
-        {
-            "name": "release",
-            "inherits": ["base"],
-            "displayName": "Release",
-            "cacheVariables": { "CMAKE_BUILD_TYPE": "Release" }
-        }
-    ]
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 21,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "cmake-dev",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_CONFIGURATION_TYPES": "Debug;Release",
+        "CMAKE_CXX_FLAGS": "/EHsc /MP /W4 /external:anglebrackets /external:W0 $penv{CXXFLAGS}"
+      }
+    },
+    {
+      "name": "vcpkg",
+      "hidden": true,
+      "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+      "cacheVariables": {
+        "VCPKG_OVERLAY_PORTS": "${sourceDir}/cmake/ports/"
+      }
+    },
+    {
+      "name": "windows",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_MSVC_RUNTIME_LIBRARY": "MultiThreaded$<$<CONFIG:Debug>:Debug>",
+        "VCPKG_TARGET_TRIPLET": "x64-windows-static"
+      }
+    },
+    {
+      "name": "vs2022",
+      "hidden": true,
+      "generator": "Visual Studio 17 2022",
+      "toolset": "v143"
+    },
+    {
+      "name": "ae",
+      "hidden": true,
+      "binaryDir": "${sourceDir}/build-161170",
+      "cacheVariables": {
+        "BUILD_SKYRIMAE": true,
+        "SUPPORT_PRE1130": false
+      }
+    },
+    {
+      "name": "vs2022-windows-vcpkg-ae",
+      "inherits": [
+        "cmake-dev",
+        "vcpkg",
+        "windows",
+        "vs2022",
+        "ae"
+      ]
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "Release",
+      "configurePreset": "vs2022-windows-vcpkg-ae",
+      "configuration": "Release"
+    }
+  ]
 }
